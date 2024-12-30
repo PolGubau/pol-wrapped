@@ -3,11 +3,8 @@
 		"dev": "deno run --watch main.ts",
 		"parse": "deno run --allow-read --allow-write --allow-import src/main.ts"
 	},
-	"imports": {
-		"@mirror/xlsx": "jsr:@mirror/xlsx@^0.20.3",
-		"@std/assert": "jsr:@std/assert@1"
-	},
 	"compilerOptions": {
 		"lib": ["deno.ns"]
-	}
+	},
+	"importMap": "./import_map.json"
 }

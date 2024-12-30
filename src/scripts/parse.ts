@@ -1,6 +1,6 @@
 import { read, set_fs, utils } from "@mirror/xlsx";
 
-import { PAGE_INDEX } from "../constants/index.ts";
+import { INPUT_PATH, OUTPUT_PATH, PAGE_INDEX } from "../constants/index.ts";
 
 // Habilitar compatibilidad con Deno
 set_fs(Deno);
@@ -70,13 +70,10 @@ const processField = (
 };
 
 // Función principal para convertir Excel a JSON
-export const convertExcelToJson = async (
-	excelFilePath: string,
-	jsonOutputPath: string,
-): Promise<void> => {
+export const convertExcelToJson = async (): Promise<void> => {
 	try {
 		// Verificar que el archivo existe
-		const excelExists = await Deno.stat(excelFilePath).catch(() => false);
+		const excelExists = await Deno.stat(INPUT_PATH).catch(() => false);
 		if (!excelExists) {
 			console.error("%c⚠️  El archivo Excel no existe.", "color: red");
 
@@ -84,7 +81,7 @@ export const convertExcelToJson = async (
 		}
 
 		// Leer el archivo Excel
-		const data = await Deno.readFile(excelFilePath);
+		const data = await Deno.readFile(INPUT_PATH);
 		const workbook = read(data, { type: "buffer" });
 
 		// Usar la primera hoja
@@ -111,13 +108,10 @@ export const convertExcelToJson = async (
 
 		// Guardar en JSON
 		await Deno.writeTextFile(
-			jsonOutputPath,
+			OUTPUT_PATH,
 			JSON.stringify(processedData, null, 2),
 		);
-		console.log(
-			`%cArchivo JSON guardado en: ${jsonOutputPath}`,
-			"color: green",
-		);
+		console.log(`%cArchivo JSON guardado en: ${OUTPUT_PATH}`, "color: green");
 	} catch (error) {
 		console.error("Error al procesar el archivo:", error);
 	}
