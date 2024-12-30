@@ -1,87 +1,35 @@
-import { read, set_fs, utils } from "@mirror/xlsx";
+import * as fs from "node:fs";
 
+import { read, utils } from "xlsx";
 import { INPUT_PATH, OUTPUT_PATH, PAGE_INDEX } from "../constants/index.ts";
-
-// Habilitar compatibilidad con Deno
-set_fs(Deno);
-
-interface ExcelRow {
-	[key: string]: string | undefined;
-}
-
-// Función para convertir el número decimal a hora
-const decimalToTime = (decimal: number): string => {
-	const hours = Math.floor(decimal * 24); // Obtener las horas
-	const minutes = Math.round((decimal * 24 - hours) * 60); // Obtener los minutos
-	return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
-};
-
-// Función para convertir el número de serie de Excel a fecha
-const decimalToDate = (serial: number): string => {
-	const epoch = new Date(1900, 0, 1);
-	epoch.setDate(epoch.getDate() + serial - 2);
-	return epoch.toLocaleDateString("en-GB");
-};
-
-// Función para procesar un campo
-const processField = (
-	field: string | undefined,
-	fieldName: string,
-): string | string[] | boolean | number | undefined | null => {
-	if (typeof field === "string" && field === "null") {
-		return null;
-	}
-	if (typeof field === "string" && field.includes(" ")) {
-		return field.split(" ").filter(Boolean);
-	}
-
-	// Verificar si el campo es 'rate' y tiene un valor numérico entre 0 y 5
-	if (fieldName === "rate") {
-		const numField = Number(field);
-		if (!Number.isNaN(numField) && numField >= 0 && numField <= 5) {
-			return numField;
-		}
-	}
-
-	// Verificar si el campo es un valor booleano representado por 0 o 1 en Excel
-	const numField = Number(field);
-	if (!Number.isNaN(numField)) {
-		if (numField === 1) {
-			return true;
-		}
-		if (numField === 0) {
-			return false;
-		}
-		if (numField > 1) {
-			return decimalToDate(numField);
-		}
-		return decimalToTime(numField); // Solo convertimos el tiempo si no es una fecha
-	}
-
-	// Verificar si el campo es una cadena que representa un valor booleano
-	if (field === "TRUE" || field === "true" || field === "1") {
-		return true;
-	}
-	if (field === "FALSE" || field === "false" || field === "0") {
-		return false;
-	}
-
-	return field;
-};
+import type { Data, DataKeys } from "../types.ts";
+import { processField } from "../utils/processField.ts";
 
 // Función principal para convertir Excel a JSON
 export const convertExcelToJson = async (): Promise<void> => {
 	try {
+		if (!INPUT_PATH) {
+			console.error("🔴 La ruta del archivo Excel no está definida.");
+			return;
+		}
+		if (!PAGE_INDEX) {
+			console.error("🔴 El índice de la hoja no está definido.");
+			return;
+		}
+
+		if (OUTPUT_PATH) {
+			console.info("🟡 El archivo de salida ya existe, se sobrescribirá.");
+		}
 		// Verificar que el archivo existe
-		const excelExists = await Deno.stat(INPUT_PATH).catch(() => false);
+		const excelExists = fs.existsSync(INPUT_PATH);
 		if (!excelExists) {
-			console.error("%c⚠️  El archivo Excel no existe.", "color: red");
+			console.error("🔴 El archivo Excel de entrada no existe.");
 
 			return;
 		}
 
 		// Leer el archivo Excel
-		const data = await Deno.readFile(INPUT_PATH);
+		const data = await fs.promises.readFile(INPUT_PATH);
 		const workbook = read(data, { type: "buffer" });
 
 		// Usar la primera hoja
@@ -94,25 +42,30 @@ export const convertExcelToJson = async (): Promise<void> => {
 		}
 
 		// Convertir la hoja a JSON
-		const rawData: ExcelRow[] = utils.sheet_to_json(sheet);
+		const rawData: Data[] = utils.sheet_to_json(sheet);
 
 		// Procesar los datos
 		const processedData = rawData.map((row) => {
 			return Object.fromEntries(
 				Object.entries(row).map(([key, value]) => [
 					key,
-					processField(value, key),
+					processField(value, key as DataKeys),
 				]),
 			);
 		});
 
+		// elimina el archivo antiguo
+		await fs.promises.unlink(OUTPUT_PATH).catch(() => {});
 		// Guardar en JSON
-		await Deno.writeTextFile(
+		await fs.promises.writeFile(
 			OUTPUT_PATH,
 			JSON.stringify(processedData, null, 2),
 		);
-		console.log(`%cArchivo JSON guardado en: ${OUTPUT_PATH}`, "color: green");
+		console.log(
+			`%c🟢 Archivo JSON guardado en: ${OUTPUT_PATH}`,
+			"color: green",
+		);
 	} catch (error) {
-		console.error("Error al procesar el archivo:", error);
+		console.error("🔴 Error al procesar el archivo:", error);
 	}
 };

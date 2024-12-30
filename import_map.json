@@ -1,9 +1,0 @@
-{
-	"imports": {
-		"@/constants": "./src/constants.ts",
-		"@/utils": "./src/utils.ts",
-		"@/scripts": "./src/scripts.ts",
-		"@mirror/xlsx": "jsr:@mirror/xlsx@^0.20.3",
-		"@std/assert": "jsr:@std/assert@1"
-	}
-}
