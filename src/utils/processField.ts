@@ -43,7 +43,6 @@ const processNames = (names: string[]): string[] => {
   const withSurnames = reconstructNamesFromDictionary(names);
 
   const withFamily = transformFamily(withSurnames);
-
   const withCorrections = applyCustomNameCorrections(withFamily);
   const parsed = withCorrections;
   return parsed;
