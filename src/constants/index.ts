@@ -1,4 +1,4 @@
-import { correctNames, surnames } from "../input/people";
+import { correctNames, surnames } from "../input/people.ts";
 
 export const PAGE_INDEX = 2;
 export const INPUT_PATH = "src/input/data.xlsx";
