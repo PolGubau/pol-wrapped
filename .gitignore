@@ -1,1 +1,2 @@
-src/input/data.xlsx
+src/input/*
+src/output/*

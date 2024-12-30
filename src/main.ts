@@ -1,9 +1,9 @@
-import { convertExcelToJson } from "./scripts/convertExcelToJson.ts";
+import { convertExcelToJson } from "./scripts/parse.ts";
 
-const excelPath = "input/data.xlsx";
-const jsonPath = "output/data.json";
+const excelPath = "src/input/data.xlsx";
+const jsonPath = "src/output/data.json";
 
 // cmd ->
-//  deno run --allow-read --allow-write --import-map=import_map.json --allow-import main.ts
+//  deno run --allow-read --allow-write --import-map=import_map.json --allow-import src/main.ts
 
 convertExcelToJson(excelPath, jsonPath);

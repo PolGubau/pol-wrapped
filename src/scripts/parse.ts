@@ -1,6 +1,6 @@
-import { read, set_fs, utils } from "xlsx/xlsx.mjs";
+import { read, set_fs, utils } from "@mirror/xlsx";
 
-import { PAGE_INDEX } from "./constants.ts";
+import { PAGE_INDEX } from "../constants/index.ts";
 
 // Habilitar compatibilidad con Deno
 set_fs(Deno);
@@ -78,7 +78,8 @@ export const convertExcelToJson = async (
 		// Verificar que el archivo existe
 		const excelExists = await Deno.stat(excelFilePath).catch(() => false);
 		if (!excelExists) {
-			console.error("El archivo Excel no existe.");
+			console.error("%c⚠️  El archivo Excel no existe.", "color: red");
+
 			return;
 		}
 

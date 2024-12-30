@@ -1,10 +1,30 @@
 {
   "version": "4",
+  "specifiers": {
+    "jsr:@mirror/xlsx@~0.20.3": "0.20.3",
+    "jsr:@std/assert@1": "1.0.10",
+    "jsr:@std/internal@^1.0.5": "1.0.5"
+  },
+  "jsr": {
+    "@mirror/xlsx@0.20.3": {
+      "integrity": "40cab5da1e169471e439f04e5980d67a435e8211846923737e268d16ee9fd0da"
+    },
+    "@std/assert@1.0.10": {
+      "integrity": "59b5cbac5bd55459a19045d95cc7c2ff787b4f8527c0dd195078ff6f9481fbb3",
+      "dependencies": [
+        "jsr:@std/internal"
+      ]
+    },
+    "@std/internal@1.0.5": {
+      "integrity": "54a546004f769c1ac9e025abd15a76b6671ddc9687e2313b67376125650dc7ba"
+    }
+  },
   "remote": {
     "https://cdn.sheetjs.com/xlsx-0.19.2/package/xlsx.mjs": "d567353135a92d369b4660041cac46a524c0e9c1c6ee7f910730f35e261cd808"
   },
   "workspace": {
     "dependencies": [
+      "jsr:@mirror/xlsx@~0.20.3",
       "jsr:@std/assert@1"
     ]
   }
