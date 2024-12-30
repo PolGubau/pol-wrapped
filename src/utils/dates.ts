@@ -9,5 +9,23 @@ export const decimalToTime = (decimal: number): string => {
 export const decimalToDate = (serial: number): string => {
   const epoch = new Date(1900, 0, 1);
   epoch.setDate(epoch.getDate() + serial - 2);
-  return epoch.toISOString().split("T")[0];
+  return epoch.toLocaleDateString("en-GB");
+};
+const convertTimeToMinutes = (time: string): number => {
+  const [hours, minutes] = time.split(":").map(Number);
+  return hours * 60 + minutes;
+};
+
+export const calculateDeviation = (realTime: string, desiredTime: string): number => {
+  const realTimeInMinutes = convertTimeToMinutes(realTime);
+  const desiredTimeInMinutes = convertTimeToMinutes(desiredTime);
+
+  // Si la hora real es antes que la deseada (cruza medianoche), sumamos 24 horas a la hora real
+  let deviation = realTimeInMinutes - desiredTimeInMinutes;
+
+  // Si la hora real es anterior a la deseada, debe sumarse 24 horas
+  if (realTimeInMinutes < desiredTimeInMinutes) {
+    deviation += 24 * 60; // 24 horas en minutos
+  }
+  return deviation;
 };

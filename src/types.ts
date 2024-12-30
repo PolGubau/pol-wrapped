@@ -1,17 +1,17 @@
 export interface Data {
   date?: string;
   ducha?: null | string;
-  "sleep-time"?: boolean | string;
+  "sleep-time"?: string; // Formato: "HH:MM"
   "wakeup-time"?: string;
   "sleep-place"?: string;
   lunch?: string;
   "lunch-time"?: string;
   "lunch-place"?: string;
-  "lunch-with"?: string[] | boolean | null | string;
+  "lunch-with"?: string[];
   "dinner-food"?: string;
-  "dinner-time"?: boolean | string;
+  "dinner-time"?: string;
   "dinner-place"?: string;
-  "dinner-with"?: string[] | boolean | null | string;
+  "dinner-with"?: string[];
   "who-i-met"?: string[] | null | string;
   "secure-2": boolean;
   "car-used": boolean;
@@ -32,6 +32,14 @@ export interface Data {
   events?: string;
   rate?: number;
   weight?: string;
+}
+
+export interface OutputData extends Data {
+  countDailyMeet?: number;
+  sleepDeviation?: number;
+  lunchDeviation?: number;
+  dinnerDeviation?: number;
+  wakeupDeviation?: number;
 }
 
 export type DataKeys = keyof Data;

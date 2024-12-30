@@ -2,3 +2,5 @@ src/input/*
 src/output/*
 node_modules/*
 dist/*
+
+src/constants/*

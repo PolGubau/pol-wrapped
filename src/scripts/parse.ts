@@ -1,8 +1,9 @@
 import { existsSync, promises } from "node:fs";
 
 import { read, utils } from "xlsx";
-import { INPUT_PATH, OUTPUT_PATH, PAGE_INDEX } from "../constants/index.ts";
-import type { Data, DataKeys } from "../types.ts";
+import { DESIRED_TIMES, INPUT_PATH, OUTPUT_PATH, PAGE_INDEX } from "../constants/index.ts";
+import type { Data, DataKeys, OutputData } from "../types.ts";
+import { calculateDeviation } from "../utils/dates.ts";
 import { processField } from "../utils/processField.ts";
 
 // Función principal para convertir Excel a JSON
@@ -44,9 +45,38 @@ export const convertExcelToJson = async (): Promise<void> => {
     // Convertir la hoja a JSON
     const rawData: Data[] = utils.sheet_to_json(sheet);
 
+    const addDerivedColumns = (row: Data): OutputData => {
+      const newRow = { ...row } as OutputData;
+
+      // Aquí puedes agregar nuevas columnas, como `count-daily-people-meet`
+      if (row["who-i-met"] && row["lunch-with"] && row["dinner-with"]) {
+        newRow.countDailyMeet = [...new Set([...row["lunch-with"], ...row["dinner-with"], ...row["who-i-met"]])].length;
+      }
+      if (row["sleep-time"]) {
+        newRow.sleepDeviation = calculateDeviation(row["sleep-time"], DESIRED_TIMES["sleep-time"]);
+      }
+
+      if (row["lunch-time"]) {
+        newRow.lunchDeviation = calculateDeviation(row["lunch-time"], DESIRED_TIMES["lunch-time"]);
+      }
+
+      if (row["dinner-time"]) {
+        newRow.dinnerDeviation = calculateDeviation(row["dinner-time"], DESIRED_TIMES["dinner-time"]);
+      }
+
+      if (row["wakeup-time"]) {
+        newRow.wakeupDeviation = calculateDeviation(row["wakeup-time"], DESIRED_TIMES["wake-time"]);
+      }
+
+      return newRow;
+    };
+
     // Procesar los datos
     const processedData = rawData.map((row) => {
-      return Object.fromEntries(Object.entries(row).map(([key, value]) => [key, processField(value, key as DataKeys)]));
+      const transformedRow = Object.fromEntries(
+        Object.entries(row).map(([key, value]) => [key, processField(value, key as DataKeys)]),
+      ) as unknown as Data;
+      return addDerivedColumns(transformedRow);
     });
 
     // elimina el archivo antiguo

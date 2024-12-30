@@ -1,59 +1,109 @@
-import { ROWS } from "../constants/index.ts";
+import { ROWS, customNameCorrections, peopleNames } from "../constants/index.ts";
 import type { DataKeys } from "../types.ts";
 import { decimalToDate, decimalToTime } from "./dates.ts";
+import { transformFamily } from "./family.ts";
+
+const reconstructNamesFromDictionary = (words: string[]): string[] => {
+  const result: string[] = [];
+  let currentIndex = 0;
+
+  while (currentIndex < words.length) {
+    let foundName = false;
+
+    // Intenta emparejar nombres completos usando el diccionario
+    for (const [fullName, nameParts] of Object.entries(peopleNames)) {
+      // Compara si las palabras en el índice actual coinciden con las del diccionario
+      const match = nameParts.every((part, i) => words[currentIndex + i] === part);
+
+      if (match) {
+        result.push(fullName); // Añade el nombre completo
+        currentIndex += nameParts.length; // Salta las palabras usadas
+        foundName = true;
+        break;
+      }
+    }
+
+    if (!foundName) {
+      // Si no se encuentra coincidencia, añade la palabra como está y avanza
+      result.push(words[currentIndex]);
+      currentIndex++;
+    }
+  }
+
+  return result;
+};
+const applyCustomNameCorrections = (names: string[]): string[] => {
+  return names.map((name) => {
+    const correctedName = Object.keys(customNameCorrections).find((key) => key.toLowerCase() === name.toLowerCase());
+    return correctedName ? customNameCorrections[correctedName] : name;
+  });
+};
+
+const processNames = (names: string[]): string[] => {
+  const withSurnames = reconstructNamesFromDictionary(names);
+
+  const withFamily = transformFamily(withSurnames);
+
+  const withCorrections = applyCustomNameCorrections(withFamily);
+  const parsed = withCorrections;
+  return parsed;
+};
 
 export const processField = (
   field: string | undefined,
   fieldName: DataKeys,
 ): string | string[] | boolean | number | undefined | null => {
   if (typeof field === "string" && field === "null") {
-    return null;
+    return;
   }
-  // Verificar si el campo es 'rate' y tiene un valor numérico entre 0 y 5
-  if (fieldName === "rate") {
-    const numField = Number(field);
-    if (!Number.isNaN(numField) && numField >= 0 && numField <= 5) {
-      return numField;
-    }
-    return null;
-  }
-  // Verificar si el campo es 'rate' y tiene un valor numérico entre 0 y 5
-  if (fieldName === "coffee") {
+
+  if (ROWS.Numeral.includes(fieldName)) {
     const numField = Number(field);
     if (!Number.isNaN(numField)) {
       return numField;
     }
+    return;
   }
-
-  if (typeof field === "string" && field.includes(" ") && ROWS.Arrayed.includes(fieldName)) {
-    // separa por espacios y borra ,
-    const arrayed = field.split(" ").filter(Boolean);
-    const noCommas = arrayed.map((item) => item.replace(",", ""));
-    return noCommas;
-  }
-
-  // Verificar si el campo es un valor booleano representado por 0 o 1 en Excel
-  const numField = Number(field);
-  if (!Number.isNaN(numField)) {
-    if (numField === 1) {
+  if (ROWS.Boolean.includes(fieldName)) {
+    if (field === "1" || field === "TRUE" || field === "true") {
       return true;
     }
-    if (numField === 0) {
+    if (field === "0" || field === "FALSE" || field === "false") {
       return false;
     }
-    if (numField > 1) {
+    return;
+  }
+  if (ROWS.Date.includes(fieldName)) {
+    const numField = Number(field);
+    if (!Number.isNaN(numField)) {
       return decimalToDate(numField);
     }
-    return decimalToTime(numField); // Solo convertimos el tiempo si no es una fecha
+    return;
+  }
+  if (ROWS.Time.includes(fieldName)) {
+    const numField = Number(field);
+    if (!Number.isNaN(numField)) {
+      return decimalToTime(numField);
+    }
+    return;
+  }
+  if (typeof field === "string" && ROWS.Arrayed.includes(fieldName)) {
+    // separa por espacios y borra ,
+    const arrayed = field
+      .split(" ")
+      .filter(Boolean)
+      .map((item) => item.replace(/^[.,]+|[.,]+$/g, "")); // Elimina puntos y comas al inicio o final
+
+    const parsed = arrayed;
+
+    if (!parsed) {
+      return [];
+    }
+
+    return processNames(parsed);
   }
 
-  // Verificar si el campo es una cadena que representa un valor booleano
-  if (field === "TRUE" || field === "true" || field === "1") {
-    return true;
+  if (field) {
+    return String(field).replace(/^[.,]+|[.,]+$/g, "");
   }
-  if (field === "FALSE" || field === "false" || field === "0") {
-    return false;
-  }
-
-  return field;
 };
