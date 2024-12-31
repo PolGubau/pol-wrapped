@@ -1,4 +1,5 @@
 import { ROWS, customNameCorrections, peopleNames } from "../constants/index.ts";
+import { residualStrings } from "../input/people.ts";
 import type { DataKeys } from "../types.ts";
 import { decimalToDate, decimalToTime } from "./dates.ts";
 import { transformFamily } from "./family.ts";
@@ -32,6 +33,13 @@ const reconstructNamesFromDictionary = (words: string[]): string[] => {
 
   return result;
 };
+
+const deleteResidualStrings = (names: string[]): string[] => {
+  // elimina los strings que coincidan con los residuales, son apellidos o nombres que no se han podido identificar con otros (Por ejemplo el apellido Camps Debería ir siempre con Anna o Jaume, nunca solo)
+
+  return names.filter((name) => !residualStrings.includes(name));
+};
+
 const applyCustomNameCorrections = (names: string[]): string[] => {
   return names.map((name) => {
     const correctedName = Object.keys(customNameCorrections).find((key) => key.toLowerCase() === name.toLowerCase());
@@ -44,7 +52,8 @@ const processNames = (names: string[]): string[] => {
 
   const withFamily = transformFamily(withSurnames);
   const withCorrections = applyCustomNameCorrections(withFamily);
-  const parsed = withCorrections;
+  const withoutResiduals = deleteResidualStrings(withCorrections);
+  const parsed = withoutResiduals;
   return parsed;
 };
 
