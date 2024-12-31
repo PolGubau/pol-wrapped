@@ -11,7 +11,7 @@ export const decimalToDate = (serial: number): string => {
   epoch.setDate(epoch.getDate() + serial - 2);
   return epoch.toISOString().split("T")[0];
 };
-export const convertTimeToMinutes = (time: string): number => {
+export const convertTimeToMinutes = (time: string): number => { // "12:00" => 720
   const [hours, minutes] = time.split(":").map(Number);
   return hours * 60 + minutes;
 };

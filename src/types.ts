@@ -1,9 +1,9 @@
 export interface Data {
   date: string;
   ducha?: null | string;
-  "sleep-time"?: string; // Formato: "HH:MM"
-  "wakeup-time"?: string;
-  "sleep-place"?: string;
+  "sleep-time": string; // Formato: "HH:MM"
+  "wakeup-time": string;
+  "sleep-place": string;
   lunch?: string;
   "lunch-time"?: string;
   "lunch-place"?: string;
@@ -23,7 +23,7 @@ export interface Data {
   alcohol?: string[];
   "tv-show"?: string;
   "films-seen"?: string;
-  "secure-1"?: boolean | null | string;
+  "secure-1"?: string;
   videogames?: string;
   train?: string;
   bus?: boolean | string;
@@ -41,7 +41,20 @@ export interface OutputData extends Data {
   dinnerDeviation?: number;
   wakeupDeviation?: number;
 }
-
+export enum Months {
+  January = "January",
+  February = "February",
+  March = "March",
+  April = "April",
+  May = "May",
+  June = "June",
+  July = "July",
+  August = "August",
+  September = "September",
+  October = "October",
+  November = "November",
+  December = "December",
+}
 export type DataKeys = keyof Data;
 
 export type DataValues = Data[DataKeys];
@@ -53,6 +66,22 @@ export interface Streak {
   who: string;
 }
 
+export interface TimeBoundary {
+  average: string;
+  max: {
+    date: string;
+    time: string;
+  };
+  min: {
+    date: string;
+    time: string;
+  };
+}
+
+export interface BasicStat {
+  amount: number;
+  ratio: number;
+}
 export interface Stats {
   people: {
     averageDailyMet: number;
@@ -60,6 +89,17 @@ export interface Stats {
     minDailyMet: number;
     topPeople: Record<string, number>;
     longestmeetingStreak: Streak[];
+  };
+
+  sleep: {
+    places: {
+      name: string;
+      amount: number;
+      ratio: number;
+    }[];
+
+    wakingUpTimings: TimeBoundary;
+    sleepingTimings: TimeBoundary;
   };
 
   food: {
@@ -97,10 +137,7 @@ export interface Stats {
     longerNoShowerStreak: number;
   };
 
-  gym: {
-    ratio: number;
-    amount: number;
-  };
+  gym: BasicStat;
   alcohol: {
     ratio: number;
     amountDays: number;
@@ -111,4 +148,34 @@ export interface Stats {
     amount: number;
     ratio: number;
   };
+  weight: {
+    average: number;
+    max: {
+      date: string;
+      weight: number;
+    };
+    min: {
+      date: string;
+      weight: number;
+    };
+    points: {
+      date: string;
+      weight: number;
+    }[];
+  };
+  carUsage: BasicStat;
+  wentOutside: BasicStat;
+  secure1: {
+    ratio: number;
+    amount: number;
+    topPlaces: Record<string, number>;
+    months: Record<
+      Months,
+      {
+        amount: number;
+        ratio: number;
+      }
+    >;
+  };
+  secure2: BasicStat;
 }

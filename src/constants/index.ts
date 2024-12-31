@@ -9,7 +9,7 @@ export const ROWS = {
   Arrayed: ["who-i-met", "lunch-with", "dinner-with", "metro", "alcohol", "places", "bus", "train"],
   People: ["who-i-met", "lunch-with", "dinner-with"],
   Time: ["sleep-time", "lunch-time", "dinner-time", "wakeup-time"],
-  Boolean: ["car-used", "secure-1", "secure-2", "went-outside", "gym", "doctor"],
+  Boolean: ["car-used", "secure-2", "went-outside", "gym", "doctor"],
   Numeral: ["rate", "coffee"],
   Date: ["date"],
 };
