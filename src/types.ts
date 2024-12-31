@@ -1,5 +1,5 @@
 export interface Data {
-  date?: string;
+  date: string;
   ducha?: null | string;
   "sleep-time"?: string; // Formato: "HH:MM"
   "wakeup-time"?: string;
@@ -20,7 +20,7 @@ export interface Data {
   places?: null | string;
   doctor?: boolean;
   gym: boolean | string;
-  alcohol?: string;
+  alcohol?: string[];
   "tv-show"?: string;
   "films-seen"?: string;
   "secure-1"?: boolean | null | string;
@@ -45,3 +45,70 @@ export interface OutputData extends Data {
 export type DataKeys = keyof Data;
 
 export type DataValues = Data[DataKeys];
+
+export interface Streak {
+  amount: number;
+  start: string;
+  end: string;
+  who: string;
+}
+
+export interface Stats {
+  people: {
+    averageDailyMet: number;
+    maxDailyMet: number;
+    minDailyMet: number;
+    topPeople: Record<string, number>;
+    longestmeetingStreak: Streak[];
+  };
+
+  food: {
+    lunch: {
+      timing: {
+        average: string;
+        max: string;
+        min: string;
+      };
+      amount: number;
+      ratio: number;
+      topPlaces: Record<string, number>;
+      topPeople: Record<string, number>;
+      topFood: Record<string, number>;
+    };
+    dinner: {
+      timing: {
+        average: string;
+        max: string;
+        min: string;
+      };
+      amount: number;
+      ratio: number;
+      topPlaces: Record<string, number>;
+      topPeople: Record<string, number>;
+      topFood: Record<string, number>;
+    };
+  };
+
+  shower: {
+    amount: number;
+    ratio: number;
+    topPlaces: Record<string, number>;
+    longerStreak: number;
+    longerNoShowerStreak: number;
+  };
+
+  gym: {
+    ratio: number;
+    amount: number;
+  };
+  alcohol: {
+    ratio: number;
+    amountDays: number;
+    amountDrinks: number;
+    topDrinks: Record<string, number>;
+  };
+  doctor: {
+    amount: number;
+    ratio: number;
+  };
+}

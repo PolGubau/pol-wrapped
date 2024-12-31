@@ -1,7 +1,7 @@
 import { existsSync, promises } from "node:fs";
 
 import { read, utils } from "xlsx";
-import { DESIRED_TIMES, INPUT_PATH, OUTPUT_PATH, PAGE_INDEX } from "../constants/index.ts";
+import { DESIRED_TIMES, INPUT_PATH, JSON_DATA_PATH, PAGE_INDEX } from "../constants/index.ts";
 import type { Data, DataKeys, OutputData } from "../types.ts";
 import { calculateDeviation } from "../utils/dates.ts";
 import { processField } from "../utils/processField.ts";
@@ -18,7 +18,7 @@ export const convertExcelToJson = async (): Promise<void> => {
       return;
     }
 
-    if (OUTPUT_PATH) {
+    if (JSON_DATA_PATH) {
       console.info("🟡 El archivo de salida ya existe, se sobrescribirá.");
     }
     // Verificar que el archivo existe
@@ -80,12 +80,12 @@ export const convertExcelToJson = async (): Promise<void> => {
     });
 
     // elimina el archivo antiguo
-    await promises.unlink(OUTPUT_PATH).catch(() => {
+    await promises.unlink(JSON_DATA_PATH).catch(() => {
       // Ignorar si el archivo no existe
     });
     // Guardar en JSON
-    await promises.writeFile(OUTPUT_PATH, JSON.stringify(processedData, null, 2));
-    console.info(`%c🟢 Archivo JSON guardado en: ${OUTPUT_PATH}`, "color: green");
+    await promises.writeFile(JSON_DATA_PATH, JSON.stringify(processedData, null, 2));
+    console.info(`%c🟢 Archivo JSON guardado en: ${JSON_DATA_PATH}`, "color: green");
   } catch (error) {
     console.error("🔴 Error al procesar el archivo:", error);
   }

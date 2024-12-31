@@ -2,7 +2,8 @@ import { correctNames, surnames } from "../input/people.ts";
 
 export const PAGE_INDEX = 2;
 export const INPUT_PATH = "src/input/data.xlsx";
-export const OUTPUT_PATH = "src/output/data.json";
+export const JSON_DATA_PATH = "src/output/data.json";
+export const STATS_PATH = "src/output/stats.json";
 
 export const ROWS = {
   Arrayed: ["who-i-met", "lunch-with", "dinner-with", "metro", "alcohol", "places", "bus", "train"],

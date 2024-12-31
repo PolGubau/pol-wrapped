@@ -9,11 +9,17 @@ export const decimalToTime = (decimal: number): string => {
 export const decimalToDate = (serial: number): string => {
   const epoch = new Date(1900, 0, 1);
   epoch.setDate(epoch.getDate() + serial - 2);
-  return epoch.toLocaleDateString("en-GB");
+  return epoch.toISOString().split("T")[0];
 };
-const convertTimeToMinutes = (time: string): number => {
+export const convertTimeToMinutes = (time: string): number => {
   const [hours, minutes] = time.split(":").map(Number);
   return hours * 60 + minutes;
+};
+
+export const convertMinutesToTime = (minutes: number): string => {
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  return `${String(hours).padStart(2, "0")}:${String(remainingMinutes).padStart(2, "0")}`;
 };
 
 export const calculateDeviation = (realTime: string, desiredTime: string): number => {

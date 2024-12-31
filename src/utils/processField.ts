@@ -62,7 +62,7 @@ export const processField = (
   fieldName: DataKeys,
 ): string | string[] | boolean | number | undefined | null => {
   if (typeof field === "string" && field === "null") {
-    return;
+    return null;
   }
 
   if (ROWS.Numeral.includes(fieldName)) {
@@ -73,20 +73,21 @@ export const processField = (
     return;
   }
   if (ROWS.Boolean.includes(fieldName)) {
-    if (field === "1" || field === "TRUE" || field === "true") {
+    if (field?.toString() === "1" || field?.toString() === "TRUE" || field?.toString() === "true") {
       return true;
     }
-    if (field === "0" || field === "FALSE" || field === "false") {
+    if (field?.toString() === "0" || field?.toString() === "FALSE" || field?.toString() === "false") {
       return false;
     }
-    return;
+
+    return null;
   }
   if (ROWS.Date.includes(fieldName)) {
     const numField = Number(field);
     if (!Number.isNaN(numField)) {
       return decimalToDate(numField);
     }
-    return;
+    return null;
   }
   if (ROWS.Time.includes(fieldName)) {
     const numField = Number(field);
@@ -99,8 +100,8 @@ export const processField = (
     // separa por espacios y borra ,
     const arrayed = field
       .split(" ")
-      .filter(Boolean)
-      .map((item) => item.replace(/^[.,]+|[.,]+$/g, "")); // Elimina puntos y comas al inicio o final
+      .map((item) => item.replace(/^[.,]+|[.,]+$/g, "").trim())
+      .filter(Boolean);
 
     const parsed = arrayed;
 
@@ -112,6 +113,10 @@ export const processField = (
   }
 
   if (field) {
-    return String(field).replace(/^[.,]+|[.,]+$/g, "");
+    return String(field)
+      .replace(/^[.,]+|[.,]+$/g, "")
+      .trim();
   }
+
+  return field;
 };

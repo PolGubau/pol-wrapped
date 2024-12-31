@@ -1,5 +1,8 @@
+import { generateStats } from "./scripts/generate-stats.ts";
 import { convertExcelToJson } from "./scripts/parse.ts";
-import { processJsonData } from "./scripts/transform.ts";
 
-convertExcelToJson();
-// processJsonData();
+// Create JSON from Excel
+await convertExcelToJson();
+
+// Generate statistics
+generateStats();
